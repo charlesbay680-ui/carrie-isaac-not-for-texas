@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/modernist-a0997230-c8b4-4507-9f6e-fc345f891b54/styles.css">
+<script src="_ds/modernist-a0997230-c8b4-4507-9f6e-fc345f891b54/_ds_bundle.js"></script>
+</helmet>
+<div style="background:var(--color-text);color:var(--color-bg);display:flex;flex-direction:column;">
+  <div style="padding:16px 32px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px 16px;font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;border-bottom:2px solid var(--color-neutral-700);">
+    <span style="color:var(--color-accent-300);">{{ label }}</span><span>{{ title }}</span>
+  </div>
+  <div style="position:relative;width:100%;aspect-ratio:16 / 9;min-height:460px;max-height:80vh;background:var(--color-neutral-900);overflow:hidden;">
+    <sc-if value="{{ isFile }}" hint-placeholder-val="{{ false }}">
+      <div class="grayscale" style="position:absolute;inset:0;"><video ref="{{ videoRef }}" src="{{ src }}" poster="{{ poster }}" autoPlay="{{ true }}" muted="{{ true }}" loop="{{ true }}" playsInline="{{ true }}" preload="auto" style="width:100%;height:100%;object-fit:cover;display:block;background:var(--color-neutral-900);"></video></div>
+      <sc-if value="{{ hasOverlay }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;left:0;bottom:0;max-width:min(100%,640px);background:var(--color-text);color:var(--color-bg);border-top:2px solid var(--color-divider);border-right:2px solid var(--color-divider);padding:clamp(18px,3vw,28px) clamp(20px,3.5vw,32px);display:flex;flex-direction:column;gap:clamp(10px,1.5vw,14px);">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;"><span class="tag tag-accent" style="white-space:nowrap;">{{ badge }}</span><span style="font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-accent-300);white-space:nowrap;">{{ kicker }}</span></div>
+          <div style="font-family:var(--font-heading);font-size:clamp(28px,3.6vw,52px);font-weight:800;line-height:0.95;letter-spacing:-0.03em;text-wrap:balance;">{{ headline }}</div>
+          <div style="font-size:16px;line-height:1.5;color:var(--color-neutral-200);text-wrap:pretty;">{{ sub }}</div>
+        </div>
+      </sc-if>
+      <button onClick="{{ toggleSound }}" class="btn btn-secondary" style="position:absolute;top:16px;right:16px;background:var(--color-bg);color:var(--color-text);white-space:nowrap;justify-content:flex-start;">{{ soundLabel }}</button>
+    </sc-if>
+    <sc-if value="{{ isEmbed }}" hint-placeholder-val="{{ false }}">
+      <iframe src="{{ embedUrl }}" title="{{ title }}" allow="autoplay; fullscreen; picture-in-picture; encrypted-media" allowFullScreen="{{ true }}" style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe>
+    </sc-if>
+    <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ true }}">
+      <div style="position:absolute;inset:0;padding:32px;display:flex;flex-direction:column;justify-content:flex-end;gap:12px;border:2px dashed var(--color-neutral-700);">
+        <div style="width:64px;height:64px;background:var(--color-accent);display:flex;align-items:center;justify-content:center;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="var(--color-bg)"><polygon points="7,4 20,12 7,20"></polygon></svg>
+        </div>
+        <div style="font-family:var(--font-heading);font-size:clamp(28px,4vw,52px);font-weight:800;line-height:0.95;letter-spacing:-0.03em;max-width:18ch;">Trailer coming soon</div>
+        <div style="font-size:15px;line-height:1.5;color:var(--color-neutral-300);max-width:48ch;">{{ note }}</div>
+      </div>
+    </sc-if>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:960,&quot;height&quot;:600},&quot;label&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Trailer&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;title&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Carrie Loves&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;src&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;link&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;poster&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;note&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;The trailer will play here.&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  embed(u) {
+    if (!u) return '';
+    let m = u.match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{11})/);
+    if (m) return `https://www.youtube-nocookie.com/embed/${m[1]}?rel=0`;
+    m = u.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+    if (m) return `https://player.vimeo.com/video/${m[1]}`;
+    return '';
+  }
+  state = { muted: true };
+  videoRef = React.createRef();
+  toggleSound = () => {
+    const v = this.videoRef.current; const muted = !this.state.muted;
+    if (v) { v.muted = muted; if (!muted) { v.currentTime = 0; v.play && v.play().catch(() => {}); } }
+    this.setState({ muted });
+  };
+  renderVals() {
+    const src = this.props.src || '';
+    const extra = {
+      videoRef: this.videoRef, toggleSound: this.toggleSound,
+      soundLabel: this.state.muted ? 'Sound on' : 'Sound off',
+      hasOverlay: !!this.props.headline,
+      headline: this.props.headline || '', kicker: this.props.kicker || '',
+      badge: this.props.badge || 'Coming soon', sub: this.props.sub || ''
+    };
+    const embedUrl = this.embed(this.props.link || '');
+    return {
+      ...extra,
+      label: this.props.label ?? 'Trailer',
+      title: this.props.title ?? 'Carrie Loves',
+      note: this.props.note ?? 'The trailer will play here.',
+      src, poster: this.props.poster || undefined, embedUrl,
+      isFile: !!src, isEmbed: !src && !!embedUrl, isEmpty: !src && !embedUrl
+    };
+  }
+}
+</script>
+</body>
+</html>
