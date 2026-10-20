@@ -50,7 +50,13 @@ a:hover{color:var(--color-accent);}
     <a href="#sources" style="color:var(--color-text);text-decoration:none;">Sources</a>
   </div>
 </nav>
-<section id="trailer" style="background:var(--color-text);"><dc-import name="Trailer Slot" label="Episode 01 · Trailer" title="Carrie Loves Aqua" src="" link="" note="The live-action trailer will play here. The animated teaser is linked below." hint-size="100%,560px"></dc-import></section>
+<section id="trailer" aria-label="Aqua episode video" style="background:#171717;padding:clamp(16px,3vw,32px);">
+  <p style="margin:0 0 16px;color:#fff;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;">Episode 01 · Carrie Loves Aqua</p>
+  <video controls playsinline preload="metadata" aria-label="Carrie Loves Aqua video" style="display:block;width:100%;max-height:75vh;aspect-ratio:16/9;object-fit:contain;background:#000;">
+    <source src="aqua-video.mp4" type="video/mp4">
+    Your browser does not support embedded video. <a href="aqua-video.mp4">Watch the Aqua video</a>.
+  </video>
+</section>
 
 
 <header style="display:flex;flex-wrap:wrap;gap:2px;background:var(--color-divider);">
